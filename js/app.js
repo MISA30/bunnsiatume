@@ -370,14 +370,22 @@
     const inner = mk('g', { class: 'mlabel-in' });
     const name = comp.mol ? comp.mol.name : 'なぞの分子';
     const w = name.length * 26 + 16;
+    // 星は図鑑に初めてのる分子のときだけ、はねて出てくる（record より先に呼ばれる）
+    const isNew = comp.mol && !save.collected[comp.mol.id];
+    const star = (x, y, s, dx, dy, delay, dot) =>
+      `<g transform="translate(${x},${y})"><g class="star-pop" style="--dx:${dx}px;--dy:${dy}px;animation-delay:${delay}s">` +
+      (dot ? `<circle class="star" r="${s}"/>` : `<path class="star" d="${STAR}" transform="scale(${s})"/>`) +
+      `</g></g>`;
     inner.innerHTML =
       `<rect class="hl" x="${-w / 2}" y="2" width="${w}" height="15" rx="7.5" transform="rotate(-2)"/>` +
       `<rect class="hl" x="${-w / 2 + 14}" y="10" width="${w * 0.55}" height="10" rx="5" transform="rotate(1.5)"/>` +
       `<text class="mname" y="0">${name}</text>` +
       `<text class="mform" y="34">${sub(comp.formula)}${comp.mol ? '' : '（図鑑にない分子）'}</text>` +
-      `<path class="star" d="${STAR}" transform="translate(${-w / 2 - 16},6) scale(.8)"/>` +
-      `<path class="star" d="${STAR}" transform="translate(${w / 2 + 14},-12) scale(.7)"/>` +
-      `<circle class="star" cx="${w / 2 + 15}" cy="4" r="1.8"/>`;
+      (isNew
+        ? star(-w / 2 - 20, 6, 1.5, 26, -4, 0.3) +
+          star(w / 2 + 18, -14, 1.3, -24, 10, 0.38) +
+          star(w / 2 + 20, 8, 3.2, -22, -2, 0.46, true)
+        : '');
     g.appendChild(inner);
     return g;
   }

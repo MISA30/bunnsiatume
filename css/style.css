@@ -171,6 +171,13 @@ button { font-family: inherit; color: inherit; }
 .mform { font-family: var(--font); font-size: 15px; text-anchor: middle; fill: var(--ink-soft); }
 .hl { fill: var(--hl); }
 .star { fill: var(--ink); }
+/* 新しい分子：星が名前の内側からくるくる回って飛び出し、外へ行くほど薄くなって消える */
+.star-pop { transform-box: fill-box; transform-origin: center; animation: starPop 1.3s both cubic-bezier(.15, .6, .35, 1); }
+@keyframes starPop {
+  0%   { transform: translate(var(--dx), var(--dy)) scale(.3) rotate(0); opacity: 0; }
+  3%   { opacity: 1; }
+  100% { transform: translate(calc(var(--dx) * -1.8), calc(var(--dy) * -1.8)) scale(.7) rotate(600deg); opacity: 0; }
+}
 .mlabel.unknown .hl { fill: rgba(150, 150, 150, .22); }
 
 /* エフェクト */
