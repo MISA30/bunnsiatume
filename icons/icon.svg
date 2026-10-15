@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#FFF4DC"/>
+  <circle cx="262" cy="270" r="128" fill="#F8DDA6"/>
+  <circle cx="250" cy="256" r="128" fill="#F2B441" stroke="#222" stroke-width="12"/>
+  <text x="250" y="262" font-family="Yomogi, 'Hiragino Maru Gothic ProN', Meiryo, sans-serif" font-size="150" text-anchor="middle" dominant-baseline="central" fill="#222">C</text>
+  <g stroke="#222" stroke-width="9">
+    <circle cx="250" cy="86" r="22" fill="#fff"/>
+    <circle cx="250" cy="426" r="22" fill="#fff"/>
+    <circle cx="80" cy="256" r="22" fill="#fff"/>
+    <circle cx="420" cy="256" r="22" fill="#fff"/>
+  </g>
+</svg>

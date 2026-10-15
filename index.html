@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>げんそあつめ</title>
+  <meta name="description" content="電子式から構造式をつくって分子を集めよう">
+  <meta name="theme-color" content="#F2B441">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Yomogi&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main id="board" class="board">
+    <svg id="svg" xmlns="http://www.w3.org/2000/svg">
+      <g id="lyBonds"></g>
+      <g id="lyAtoms"></g>
+      <g id="lyShared"></g>
+      <g id="lyLabels"></g>
+      <g id="lyInk"></g>
+      <g id="lyLink"></g>
+      <g id="lyFx"></g>
+    </svg>
+
+    <div id="emptyHint" class="empty-hint">
+      元素記号を書いて ◯ でかこむか、右の「元素」からドラッグしてみよう
+      <small>○（ひとりの電子）から、ほかの原子の ○ へ線を引くとつながるよ</small>
+    </div>
+
+    <button id="gearBtn" class="icon-btn" aria-label="設定">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="6.8"/><path d="M12 2.2v2.6M12 19.2v2.6M2.2 12h2.6M19.2 12h2.6M5.1 5.1l1.8 1.8M17.1 17.1l1.8 1.8M5.1 18.9l1.8-1.8M17.1 6.9l1.8-1.8"/></svg>
+    </button>
+
+    <div class="tools">
+      <button id="toolDraw" class="icon-btn tool active" aria-label="えんぴつ（つなぐ・動かす）" title="えんぴつ：元素記号を書いて丸でかこむ・電子から線を引く・原子を動かす">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><path d="M4 20l1.2-4.6L15.8 4.8a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L8.6 18.8z"/><path d="M14 6.6l3.4 3.4"/></svg>
+      </button>
+      <button id="toolErase" class="icon-btn tool" aria-label="消しゴム" title="消しゴム：原子や結合をタップして消す（E キー）">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><path d="M9 20h11"/><path d="M4.6 14.6l9.2-9.2a2 2 0 0 1 2.8 0l2.9 2.9a2 2 0 0 1 0 2.8L12 18.6H8.6z"/><path d="M9.4 9.8l5.6 5.6"/></svg>
+      </button>
+    </div>
+
+    <aside id="palette" class="palette">
+      <button id="paletteToggle" class="pal-toggle" aria-label="元素パレットの開閉">◀</button>
+      <div class="pal-head">元素</div>
+      <div id="paletteList" class="pal-list"></div>
+      <div class="pal-trash">ここに戻すと<br>消えるよ</div>
+    </aside>
+
+    <button id="bookBtn" class="icon-btn book-btn" aria-label="図鑑をひらく">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 6.5C9.5 4.8 6.5 4.4 3 5v13.5c3.5-.6 6.5-.2 9 1.5 2.5-1.7 5.5-2.1 9-1.5V5c-3.5-.6-6.5-.2-9 1.5z"/><path d="M12 6.5V20"/></svg>
+      <span id="bookBadge" class="badge" hidden></span>
+    </button>
+
+    <div id="cands" class="cands" hidden></div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <!-- 図鑑 -->
+  <div id="bookOverlay" class="book-overlay" hidden>
+    <div id="book" class="book">
+      <div id="pageL" class="page page-l"></div>
+      <div id="pageR" class="page page-r"></div>
+      <div class="spine"></div>
+      <div id="cover" class="cover">
+        <div class="cover-face cover-front">
+          <svg class="cover-flask" viewBox="0 0 64 84" width="110" fill="none" stroke="#222" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="15" cy="10" r="6.5"/>
+            <circle cx="30" cy="25" r="4.2"/>
+            <path d="M24 36h16"/>
+            <path d="M27 36v14L13 72a3 3 0 0 0 2.6 4.5h32.8A3 3 0 0 0 51 72L37 50V36"/>
+            <path d="M30.5 54.5h3M30.5 59.5h3M30.5 64.5h3M30.5 69.5h3" stroke-width="2"/>
+          </svg>
+          <div class="cover-title">げんそあつめ</div>
+          <div class="cover-sub">構造式ずかん</div>
+        </div>
+        <div class="cover-face cover-back"></div>
+      </div>
+      <div id="leaf" class="leaf" hidden>
+        <div id="leafFront" class="leaf-face leaf-front"></div>
+        <div id="leafBack" class="leaf-face leaf-back"></div>
+      </div>
+      <div id="detail" class="detail" hidden>
+        <div class="detail-card">
+          <button id="detailClose" class="close-x" aria-label="閉じる">×</button>
+          <div id="detailBody"></div>
+        </div>
+      </div>
+    </div>
+    <button id="bookPrev" class="book-nav prev" aria-label="前のページ">‹</button>
+    <button id="bookNext" class="book-nav next" aria-label="次のページ">›</button>
+    <button id="bookClose" class="book-close" aria-label="図鑑を閉じる">とじる</button>
+  </div>
+
+  <!-- 設定 -->
+  <div id="settings" class="modal" hidden>
+    <div class="modal-card">
+      <h2>せってい</h2>
+      <label class="row"><input id="soundChk" type="checkbox"> 効果音</label>
+      <div class="stack">
+        <button id="helpBtn" class="btn">遊び方を見る</button>
+        <button id="clearBtn" class="btn">キャンバスを片付ける</button>
+        <button id="resetBtn" class="btn danger">図鑑の記録をリセット</button>
+      </div>
+      <div class="credits">
+        フォント<br>
+        <b>Special Elite</b> — Astigmatic（Apache License 2.0）<br>
+        <b>Yomogi</b> — Satsuyako（SIL Open Font License 1.1）
+      </div>
+      <div class="right"><button id="settingsClose" class="btn primary">とじる</button></div>
+    </div>
+  </div>
+
+  <!-- 遊び方 -->
+  <div id="help" class="modal" hidden>
+    <div class="modal-card help">
+      <h2>げんそあつめ の遊び方</h2>
+      <ol>
+        <li>キャンバスに <b>元素記号を書いて ◯ でかこむ</b> と原子になるよ。<br>右の <b>元素</b> からドラッグしても置ける（タップでもOK）。</li>
+        <li>原子のまわりの点が <b>電子</b>。<br>
+          <span class="dot white"></span> ひとりの電子（不対電子）　<span class="dot black"></span><span class="dot black"></span> 2つで1組の電子（電子対）</li>
+        <li><span class="dot white"></span> から、ほかの原子の <span class="dot white"></span> へ <b>線を引く</b> と、2つの電子が1組になって結合するよ。</li>
+        <li>ぜんぶの <span class="dot white"></span> がなくなると……<b>ポンッ！</b> 構造式に変わって、図鑑に記録される。</li>
+        <li><span class="dot metal"></span> 青い原子は <b>金属</b>。線を引くと電子を相手にわたして、イオンになるよ。</li>
+        <li>集めた分子は左下の <b>本</b> から見られるよ。たくさん集めると、リストの分子が増えていく！</li>
+      </ol>
+      <div class="right"><button id="helpClose" class="btn primary">はじめる</button></div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/chem.js"></script>
+  <script src="js/ink.js"></script>
+  <script src="js/book.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
